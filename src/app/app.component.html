@@ -29,7 +29,7 @@
     <mat-tab label="Detailed View">
       <div class="custom" style="width: 90%;">
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-3">
             <div class="list-group">
               <ng-template ngFor let-parent [ngForOf]="parentsData" let-i="index" let-odd="odd">
                 <a href="#" class="list-group-item list-group-item-action" [class.active]="selectedIndex === i"
@@ -39,33 +39,29 @@
               </ng-template>
             </div>
           </div>
-          <div class="col-md-6" *ngIf="questions.length > 0">
+          <div class="col-md-9" *ngIf="questions.length > 0">
             <div>
               <form (ngSubmit)="onSubmit()" [formGroup]="form">
-                <div *ngFor="let question of questions" class="form-row">
+                <div *ngFor="let question of questions" class="">
                   <div [formGroup]="form">
-                    <label [attr.for]="question.key" *ngIf="question.key != 3">{{question.label}}</label>
-                    <div [ngSwitch]="question.controlType">
-                      <input *ngSwitchCase="'textbox'" [formControlName]="question.key" [id]="question.key"
-                        [type]="question.type" [value]="question.value"  class="form-control" >
-                      <div *ngIf="question.value == true; then thenBlock else elseBlock"></div>
-                      <ng-template #thenBlock>
-                        <label *ngSwitchCase="'checkbox'" [formControlName]="question.key">
-                          <input type="checkbox" [id]="question.key" [type]="question.type" [value]="question.value"
-                            (change)="changeChecked($event)" checked="true">
-                          {{question.label}}
-                        </label>
-                      </ng-template>
-                      <ng-template #elseBlock>
-
-                        <label *ngSwitchCase="'checkbox'" [formControlName]="question.key">
-                          <input type="checkbox" [id]="question.key" [type]="question.type" [value]="question.value"
-                            (change)="changeChecked($event)">
-                          {{question.label}}
-                        </label>
-                      </ng-template>
-                    </div>
-                    <div class="errorMessage" *ngIf="!isValidMessage && isShowMessageKey == question.key">{{question.label}} is required</div>
+                    
+                      <div class="row" style="padding: 10px;">
+                        <div class="col-md-3">
+                          <label [attr.for]="question.key" >{{question.label}}</label>
+                        </div>
+                        <div class="col-md-9" [ngSwitch]="question.controlType">
+                          <!-- <div > -->
+                            <input *ngSwitchCase="'textbox'" [formControlName]="question.key" [id]="question.key"
+                              [type]="question.type" [value]="question.value"  class="form-control" >
+                            
+                              <label *ngSwitchCase="'checkbox'" [formControlName]="question.key">
+                                <input type="checkbox" [id]="question.key" [type]="question.type" [value]="question.value"
+                                  (change)="changeChecked($event)" [checked]="question.value">
+                              </label>
+                          <!-- </div> -->
+                          <!-- <div class="errorMessage" *ngIf="!isValidMessage && isShowMessageKey == question.key">{{question.label}} is required</div> -->
+                        </div>
+                      </div>
                   </div>
                   <!-- <app-render-element [question]="question" [form]="form"></app-render-element> -->
                 </div>

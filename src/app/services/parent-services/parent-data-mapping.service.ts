@@ -17,6 +17,7 @@ export class ParentDataMappingService {
 
     return this.http.get(`${environment.WebApiURL}api/ManageParent/GetParentlist`).pipe(
       map((response: any) => {
+        
         return response.stParentObject
       }));
   }

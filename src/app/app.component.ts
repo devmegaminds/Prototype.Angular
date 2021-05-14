@@ -59,47 +59,50 @@ export class AppComponent {
   async getSummaryData() {
     await this._parentDataMappingService.getparentJsonData().subscribe((response) => {
       if (!!response) {
-        var JSONData = JSON.parse(response);
-        this.parentsData = JSONData.Datas;
-        console.log(this.parentsData)
-        this.parentsData.forEach(element => {
-          let indexOfItem = element.Properties.map(function (d) { return d['Label']; }).indexOf('Project Name');
-          if (indexOfItem == -1) {
-            element.Properties.splice(0, 0, {
-              "Id": 1,
-              "Value": "",
-              "Label": "Project Name",
-              "PropertyType": 0
-            })
-          }
-          indexOfItem = element.Properties.map(function (d) { return d['Label']; }).indexOf('Construction Count');
-          if (indexOfItem == -1) {
-            element.Properties.splice(1, 0, {
-              "Id": 2,
-              "Value": "",
-              "Label": "Construction Count",
-              "PropertyType": 2
-            })
-          }
-          indexOfItem = element.Properties.map(function (d) { return d['Label']; }).indexOf('Is Construction Completed');
-          if (indexOfItem == -1) {
-            element.Properties.splice(2, 0, {
-              "Id": 3,
-              "Value": "",
-              "Label": "Is Construction Completed",
-              "PropertyType": 3
-            })
-          }
-          indexOfItem = element.Properties.map(function (d) { return d['Label']; }).indexOf('Length of the road');
-          if (indexOfItem == -1) {
-            element.Properties.splice(3, 0, {
-              "Id": 4,
-              "Value": "",
-              "Label": "Length of the road",
-              "PropertyType": 1
-            })
-          }
-        });
+        var JSONData = JSON.parse(response).Datas;
+        console.log(response);
+        
+        console.log(JSONData);
+        this.parentsData = JSONData;
+        //console.log(this.parentsData)
+        // this.parentsData.forEach(element => {
+        //   let indexOfItem = element.Properties.map(function (d) { return d['Label']; }).indexOf('Project Name');
+        //   if (indexOfItem == -1) {
+        //     element.Properties.splice(0, 0, {
+        //       "Id": 1,
+        //       "Value": "",
+        //       "Label": "Project Name",
+        //       "PropertyType": 0
+        //     })
+        //   }
+        //   indexOfItem = element.Properties.map(function (d) { return d['Label']; }).indexOf('Construction Count');
+        //   if (indexOfItem == -1) {
+        //     element.Properties.splice(1, 0, {
+        //       "Id": 2,
+        //       "Value": "",
+        //       "Label": "Construction Count",
+        //       "PropertyType": 2
+        //     })
+        //   }
+        //   indexOfItem = element.Properties.map(function (d) { return d['Label']; }).indexOf('Is Construction Completed');
+        //   if (indexOfItem == -1) {
+        //     element.Properties.splice(2, 0, {
+        //       "Id": 3,
+        //       "Value": "",
+        //       "Label": "Is Construction Completed",
+        //       "PropertyType": 3
+        //     })
+        //   }
+        //   indexOfItem = element.Properties.map(function (d) { return d['Label']; }).indexOf('Length of the road');
+        //   if (indexOfItem == -1) {
+        //     element.Properties.splice(3, 0, {
+        //       "Id": 4,
+        //       "Value": "",
+        //       "Label": "Length of the road",
+        //       "PropertyType": 1
+        //     })
+        //   }
+        // });
         console.log(this.parentsData);
         var GetFirstParentDataBasedOnSamplingTime = this.parentsData.filter(
           parents => parents.SamplingTime === this.parentsData[0].SamplingTime);
@@ -156,7 +159,7 @@ export class AppComponent {
     })
   }
   updateDynamicFormValues() {
-    debugger
+    
     const DetailsViewSubscription = this.questions$.subscribe({
       next(position) {
         localStorage.setItem("SummaryView", JSON.stringify(position))
@@ -258,7 +261,7 @@ export class AppComponent {
   //#region Update Property
 
   onSubmit() {
-    if (this.form.valid) {
+    //if (this.form.valid) {
       let body = new Properties()
       body.Properties = []
       body.SamplingTime = this.ActiveSamplingTime;
@@ -309,7 +312,7 @@ export class AppComponent {
       this._parentDataMappingService.updateParentProperty(body).subscribe((response) => {
         if (!!response) {
           alert(response.message);
-
+          this.getSummaryData();
         }
       },
         (error) => {
@@ -321,7 +324,7 @@ export class AppComponent {
         }
       );
     }
-  }
+  //}
   //#endregion End Property
 }
 
