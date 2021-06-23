@@ -1,22 +1,12 @@
 import { Component, ComponentFactoryResolver, Input } from '@angular/core';
-import { MatTabsModule } from '@angular/material/tabs';
 import { ParentDataMappingService } from '../app/services/parent-services/parent-data-mapping.service'
-
-// import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
-
-
 import { FormComponentBase } from '../app/models/form-component-model';
-import { DropdownQuestion } from './services/parent-services/form-component-dropdown';
 import { TextboxQuestion } from './services/parent-services/form-component-textbox';
 import { CheckBoxQuestion } from './services/parent-services/form-component-checkbox';
 import { Observable, of } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 import { QuestionControlService } from './services/parent-services/form-component.service';
-import { JsonPipe } from '@angular/common';
-
 import { Properties, Property } from '../app/models/properties.model'
-
-
 
 @Component({
   selector: 'app-root',
@@ -38,13 +28,11 @@ export class AppComponent {
   constructor(private _parentDataMappingService: ParentDataMappingService,
     private qcs: QuestionControlService) { }
 
-
   ngOnInit(): void {
     this.getSummaryData();
     this.questions$ = this.getQuestions();
     this.form = this.qcs.toFormGroup(this.questions);
   }
-
 
   //#region Summary View
 
@@ -55,14 +43,21 @@ export class AppComponent {
     }
     return IsObjectOrNot;
   }
+  findPrototypeValue(val, lable): string {
 
+    var data = val.find(parents => parents.Label === lable);
+    if (data != undefined)
+      return data.Value;
+    else
+      "";
+  }
   async getSummaryData() {
     await this._parentDataMappingService.getparentJsonData().subscribe((response) => {
       if (!!response) {
         var JSONData = JSON.parse(response).Datas;
-        console.log(response);
-        
-        console.log(JSONData);
+        //console.log(response);
+
+        //console.log(JSONData);
         this.parentsData = JSONData;
         //console.log(this.parentsData)
         // this.parentsData.forEach(element => {
@@ -103,7 +98,7 @@ export class AppComponent {
         //     })
         //   }
         // });
-        console.log(this.parentsData);
+        //console.log(this.parentsData);
         var GetFirstParentDataBasedOnSamplingTime = this.parentsData.filter(
           parents => parents.SamplingTime === this.parentsData[0].SamplingTime);
         this.ActiveSamplingTime = this.parentsData[0].SamplingTime;
@@ -152,14 +147,40 @@ export class AppComponent {
     }
   }
   changeChecked(event) {
+    debugger
+    let show = true;
+    let show3 = true;
+    let i = this.selectedIndex
     Object.keys(this.form.controls).forEach((key) => {
-      if (key === '3') {
-        this.form.controls[key].setValue(event.target.value == "false" ? true : false);
+      switch ('1' == '1') {
+        case (key === '2'): {
+          if (this.form.controls[3] == undefined) {
+            this.form.controls[key].setValue(event.target.value == "false" ? true : false);
+            show = false;
+          }
+          else {
+            if (this.form.controls[3].value == true || this.form.controls[3].value == "") {
+            } else {
+              this.form.controls[key].setValue(event.target.value == "false" ? true : false);
+              show = false;
+            }
+          }
+          break;
+        }
+        case (key === '3'): {
+          if (show == true) {
+            this.form.controls[key].setValue(event.target.value == "false" ? true : false);
+          }
+          break;
+        }
+        default: {
+          break;
+        }
       }
     })
   }
   updateDynamicFormValues() {
-    
+
     const DetailsViewSubscription = this.questions$.subscribe({
       next(position) {
         localStorage.setItem("SummaryView", JSON.stringify(position))
@@ -260,71 +281,199 @@ export class AppComponent {
 
   //#region Update Property
 
-  onSubmit() {
-    //if (this.form.valid) {
-      let body = new Properties()
-      body.Properties = []
-      body.SamplingTime = this.ActiveSamplingTime;
-      Object.keys(this.form.controls).forEach((key) => {
-        const control = this.form.controls[key];
-        if (key === '1') {
-          body.Properties.push({
-            Id: Number(key),
-            Label: 'Project Name',
-            PropertyType: 0,
-            Value: control.value
-          });
-        }
-        else if (key === '2') {
-          body.Properties.push({
-            Id: Number(key),
-            Label: 'Construction Count',
-            PropertyType: 2,
-            Value: control.value,
-          });
-        }
-        else if (key === '3') {
-          body.Properties.push({
-            Id: Number(key),
-            Label: 'Is Construction Completed',
-            PropertyType: 3,
-            Value: control.value == "" ? false : control.value,
-          });
-        }
-        else if (key === '4') {
-          body.Properties.push({
-            Id: Number(key),
-            Label: 'Length of the road',
-            PropertyType: 1,
-            Value: {
-              "Value": control.value,
-              "Unit": {
-                "Id": 1,
-                "Symbol": "KM"
-              }
+  onSubmit() {    
+    let body = new Properties()
+    let i = this.selectedIndex
+    let two = true
+    let three = true
+    let one = true
+    body.Properties = []
+    body.SamplingTime = this.ActiveSamplingTime;
+
+    Object.keys(this.form.controls).forEach((key) => {
+      const control = this.form.controls[key];
+      if (key === '1') {
+        body.Properties.push({
+          Id: Number(key),
+          Label: 'Project Name',
+          PropertyType: 0,
+          Value: control.value == "" ? 0 : control.value,
+        });        
+      }
+      if (key === '2') {
+        let show = true;
+        for (let index = 0; index < this.parentsData[i].Properties.length; index++) {
+
+          if (show == true) {
+            if (this.parentsData[i].Properties[index].PropertyType == "2") {
+              body.Properties.push({
+                Id: Number(key),
+                Label: 'Construction Count',
+                PropertyType: 2,
+                Value: control.value == "" ? 0 : control.value,
+              });
+              two = false;
+              show = false;
             }
-          });
-        }
-
-      });
-      this.payLoad = JSON.stringify(body);
-
-      this._parentDataMappingService.updateParentProperty(body).subscribe((response) => {
-        if (!!response) {
-          alert(response.message);
-          this.getSummaryData();
-        }
-      },
-        (error) => {
-          if (error.status == 0) {
-
-          } else if (error.status == 500) {
-
+          }
+          if (show == true) {
+            if (this.parentsData[i].Properties[index].PropertyType == "3") {
+              body.Properties.push({
+                Id: Number(key),
+                Label: 'Is Construction Completed',
+                PropertyType: 3,
+                Value: control.value == "" ? false : control.value,
+              });
+              three = false;
+              show = false;
+            }
+          }
+          if (show == true) {
+            if (this.parentsData[i].Properties[index].PropertyType == "1") {
+              body.Properties.push({
+                Id: Number(key),
+                Label: 'Length of the road',
+                PropertyType: 1,
+                Value: {
+                  "Value": control.value,
+                  "Symbol": 'KM',
+                  "Unit": {
+                    "Id": 1
+                  }
+                }
+              });
+              one = false;
+              show = false;
+            }
           }
         }
-      );
-    }
-  //}
-  //#endregion End Property
+      }
+      if (key === '3') {
+        let show1 = true
+        for (let index = 0; index < this.parentsData[i].Properties.length; index++) {
+
+          if (show1 == true) {
+            if (two == true) {
+              if (this.parentsData[i].Properties[index].PropertyType == "2") {
+                body.Properties.push({
+                  Id: Number(key),
+                  Label: 'Construction Count',
+                  PropertyType: 2,
+                  Value: control.value == "" ? 0 : control.value,
+                });
+                two = false;
+                show1 = false;
+              }
+            }
+
+          } if (show1 == true) {
+            if (three == true) {
+              if (this.parentsData[i].Properties[index].PropertyType == "3") {
+                body.Properties.push({
+                  Id: Number(key),
+                  Label: 'Is Construction Completed',
+                  PropertyType: 3,
+                  Value: control.value == "" ? false : control.value,
+                });
+                three = false
+                show1 = false;
+              }
+            }
+          }
+          if (show1 == true) {
+            if (one == true) {
+              if (this.parentsData[i].Properties[index].PropertyType == "1") {
+                body.Properties.push({
+                  Id: Number(key),
+                  Label: 'Length of the road',
+                  PropertyType: 1,
+                  Value: {
+                    "Value": control.value,
+                    "Symbol": 'KM',
+                    "Unit": {
+                      "Id": 1
+                    }
+                  }
+                });
+                one = false;
+                show1 = false;
+              }
+            }
+          }
+        }
+      }
+      if (key === '4') {
+        let show1 = true
+        for (let index = 0; index < this.parentsData[i].Properties.length; index++) {
+
+          if (show1 == true) {
+            if (two == true) {
+              if (this.parentsData[i].Properties[index].PropertyType == "2") {
+                body.Properties.push({
+                  Id: Number(key),
+                  Label: 'Construction Count',
+                  PropertyType: 2,
+                  Value: control.value == "" ? 0 : control.value,
+                });
+                two = false;
+                show1 = false;
+              }
+            }
+
+          } if (show1 == true) {
+            if (three == true) {
+              if (this.parentsData[i].Properties[index].PropertyType == "3") {
+                body.Properties.push({
+                  Id: Number(key),
+                  Label: 'Is Construction Completed',
+                  PropertyType: 3,
+                  Value: control.value == "" ? false : control.value,
+                });
+                three = false
+                show1 = false;
+              }
+            }
+          }
+          if (show1 == true) {
+            if (one == true) {
+              if (this.parentsData[i].Properties[index].PropertyType == "1") {
+                body.Properties.push({
+                  Id: Number(key),
+                  Label: 'Length of the road',
+                  PropertyType: 1,
+                  Value: {
+                    "Value": control.value,
+                    "Symbol": 'KM',
+                    "Unit": {
+                      "Id": 1
+                    }
+                  }
+                });
+                one = false;
+                show1 = false;
+              }
+            }
+          }
+        }
+      }
+    });
+
+    this.payLoad = JSON.stringify(body);
+
+    this._parentDataMappingService.updateParentProperty(body).subscribe((response) => {
+      if (!!response) {
+        alert(response.message);
+        this.getSummaryData();
+      }
+    },
+      (error) => {
+        if (error.status == 0) {
+
+        } else if (error.status == 500) {
+
+        }
+      }
+    );
+  }
 }
 

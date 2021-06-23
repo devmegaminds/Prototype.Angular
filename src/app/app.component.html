@@ -5,7 +5,6 @@
       <table class="table table-striped" *ngIf="parentsData.length > 0">
         <thead>
           <tr>
-
             <th>SamplingTime</th>
             <th scope="col" *ngFor="let item of parentsData[0].Properties;index as x">
               {{item.Label}}
@@ -16,12 +15,14 @@
           <tr *ngFor="let parent of parentsData; index as i">
             <td>
               {{ parent.SamplingTime | date:"dd/MM/yyyy HH:mm a" }}
-            </td>
-            <td *ngFor="let property of parent.Properties; index as j">
-              <div *ngIf="IsObject(property.Value); then thenBlock else elseBlock"></div>
-              <ng-template #thenBlock>{{ property.Value.Value }}</ng-template>
-              <ng-template #elseBlock>{{property.Value}}</ng-template>
-            </td>
+            </td>            
+            <ng-template ngFor let-item [ngForOf]="parentsData[0].Properties" let-j="index">              
+              <td> 
+                <div *ngIf="IsObject(findPrototypeValue(parent.Properties, item.Label)); then thenBlock else elseBlock"></div>
+                <ng-template #thenBlock>{{ findPrototypeValue(parent.Properties, item.Label).Value }}</ng-template>
+                <ng-template #elseBlock>{{ findPrototypeValue(parent.Properties, item.Label) }}</ng-template>              
+              </td>
+            </ng-template>   
           </tr>
         </tbody>
       </table>
@@ -49,37 +50,27 @@
                         <div class="col-md-3">
                           <label [attr.for]="question.key" >{{question.label}}</label>
                         </div>
-                        <div class="col-md-9" [ngSwitch]="question.controlType">
-                          <!-- <div > -->
+                        <div class="col-md-9" [ngSwitch]="question.controlType">                          
                             <input *ngSwitchCase="'textbox'" [formControlName]="question.key" [id]="question.key"
                               [type]="question.type" [value]="question.value"  class="form-control" >
                             
                               <label *ngSwitchCase="'checkbox'" [formControlName]="question.key">
                                 <input type="checkbox" [id]="question.key" [type]="question.type" [value]="question.value"
                                   (change)="changeChecked($event)" [checked]="question.value">
-                              </label>
-                          <!-- </div> -->
-                          <!-- <div class="errorMessage" *ngIf="!isValidMessage && isShowMessageKey == question.key">{{question.label}} is required</div> -->
+                              </label>                          
                         </div>
                       </div>
                   </div>
-                  <!-- <app-render-element [question]="question" [form]="form"></app-render-element> -->
                 </div>
 
                 <div class="form-row">
-                  <button type="submit" class="btn btn-primary mr-1">Save</button>
-                  <!-- [disabled]="!form.valid" -->
+                  <button type="submit" class="btn btn-primary mr-1">Save</button>                  
                 </div>
               </form>
-              <!-- <div *ngIf="payLoad" class="form-row">
-                <strong>Saved the following values</strong><br>{{payLoad}}
-              </div> -->
-            </div>
-            <!-- <app-dynamic-form [questions]="questions$ | async"></app-dynamic-form> -->
+            </div>            
           </div>
         </div>
-      </div>
-      <!-- <app-summary-and-detailed></app-summary-and-detailed> -->
+      </div>      
     </mat-tab>
   </mat-tab-group>
 </div>
