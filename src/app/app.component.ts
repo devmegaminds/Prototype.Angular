@@ -45,7 +45,7 @@ export class AppComponent {
   }
   findPrototypeValue(val, lable): string {
 
-    var data = val.find(parents => parents.Label === lable);
+    var data = val.find(parents => parents.Label.toLowerCase() === lable.toLowerCase());
     if (data != undefined)
       return data.Value;
     else
