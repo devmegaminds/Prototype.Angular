@@ -43,11 +43,10 @@ export class AppComponent {
     }
     return IsObjectOrNot;
   }
-  findPrototypeValue(val, lable): string {
-
-    var data = val.find(parents => parents.Label.toLowerCase() === lable.toLowerCase());
-    if (data != undefined)
-      return data.Value;
+  findPrototypeValue(data, lable): string {
+    var result = data.find(x => x.Label.toLowerCase() === lable.toLowerCase());
+    if (result != undefined)
+      return result.Value;
     else
       "";
   }
