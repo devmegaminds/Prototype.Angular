@@ -8,3 +8,18 @@ label {
     margin-bottom: .5rem;
     margin-top: .5rem !important;
 }
+.currency-wrap{
+    position:relative;
+}
+
+.currency-code{
+    position:absolute;
+    left:242px;
+    top:10px;
+}
+
+.text-currency{
+    padding: .365rem 1.105rem .365rem 0.75rem;
+    border:solid 1px #ccc;
+    border-radius:5px;
+}

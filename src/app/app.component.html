@@ -50,15 +50,20 @@
                         <div class="col-md-3">
                           <label [attr.for]="question.key" >{{question.label}}</label>
                         </div>
-                        <div class="col-md-9" [ngSwitch]="question.controlType">                          
-                            <input *ngSwitchCase="'textbox'" [formControlName]="question.key" [id]="question.key"
-                              [type]="question.type" [value]="question.value"  class="form-control" >
-                            
-                              <label *ngSwitchCase="'checkbox'" [formControlName]="question.key">
-                                <input type="checkbox" [id]="question.key" [type]="question.type" [value]="question.value"
-                                  (change)="changeChecked($event)" [checked]="question.value">
-                              </label>                          
+                        <div *ngIf="question.label == 'Length of the road'" class="col-md-9" [ngSwitch]="question.controlType">                          
+                            <input *ngSwitchCase="'textbox'" [formControlName]="question.key" [id]="question.key" style="width:250px"
+                              [type]="question.type" [value]="question.value"  class="form-control text-currency" >  
+                              <span class="currency-code">KM</span>                                      
                         </div>
+                        <div *ngIf="question.label !== 'Length of the road'" class="col-md-9" [ngSwitch]="question.controlType">                          
+                          <input *ngSwitchCase="'textbox'" [formControlName]="question.key" [id]="question.key" style="width:250px"
+                            [type]="question.type" [value]="question.value"  class="form-control" >
+                          
+                            <label *ngSwitchCase="'checkbox'" [formControlName]="question.key">
+                              <input type="checkbox" [id]="question.key" [type]="question.type" [value]="question.value"
+                                (change)="changeChecked($event)" [checked]="question.value">
+                            </label>                          
+                      </div>
                       </div>
                   </div>
                 </div>
