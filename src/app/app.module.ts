@@ -14,9 +14,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgbPaginationModule, NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { HttpClientModule } from '@angular/common/http';
-import { DynamicFormComponent } from './pages/dynamic-form/dynamic-form.component'; // add this line
+
 import { QuestionControlService } from '../app/services/parent-services/form-component.service';
-import { RenderElementComponent } from './pages/dynamic-form/render-component/render-element/render-element.component';
+
 // import { SummaryAndDetailedViewComponent } from './pages/DetailsView/summary-and-detailed-view/summary-and-detailed-view.component';
 
 import { FormsModule } from "@angular/forms";
@@ -24,9 +24,7 @@ import { FormsModule } from "@angular/forms";
 @NgModule({
  
   declarations: [
-    AppComponent,
-    DynamicFormComponent,
-    RenderElementComponent,
+    AppComponent
     // SummaryAndDetailedViewComponent
   ],
   imports: [

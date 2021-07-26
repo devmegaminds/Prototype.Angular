@@ -22,7 +22,7 @@
                     <div
                       *ngIf="IsObject(findPrototypeValue(parent.Properties, item.Label)); then thenBlock else elseBlock">
                     </div>
-                    <ng-template #thenBlock>{{ findPrototypeValue(parent.Properties, item.Label).Value }}KM</ng-template>
+                    <ng-template #thenBlock>{{ findPrototypeValue(parent.Properties, item.Label).Value }} KM</ng-template>
                     <ng-template #elseBlock>{{ findPrototypeValue(parent.Properties, item.Label) }}</ng-template>
                   </td>
                 </ng-template>
