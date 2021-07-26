@@ -9,21 +9,80 @@
             <th scope="col" *ngFor="let item of parentsData[0].Properties;index as x">
               {{item.Label}}
             </th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let parent of parentsData; index as i">
-            <td>
-              {{ parent.SamplingTime | date:"dd/MM/yyyy HH:mm a" }}
-            </td>            
-            <ng-template ngFor let-item [ngForOf]="parentsData[0].Properties" let-j="index">              
-              <td> 
-                <div *ngIf="IsObject(findPrototypeValue(parent.Properties, item.Label)); then thenBlock else elseBlock"></div>
-                <ng-template #thenBlock>{{ findPrototypeValue(parent.Properties, item.Label).Value }} KM</ng-template>
-                <ng-template #elseBlock>{{ findPrototypeValue(parent.Properties, item.Label) }}</ng-template>              
-              </td>
-            </ng-template>   
-          </tr>
+          <ng-container *ngFor="let parent of parentsData; index as i;">
+            <tr>
+              <th scope="row">{{ parent.SamplingTime | date:"dd/MM/yyyy HH:mm a" }}</th>
+              <ng-container *ngIf="enableEditIndex != i">
+                <ng-template ngFor let-item [ngForOf]="parentsData[0].Properties" let-j="index">
+                  <td>
+                    <div
+                      *ngIf="IsObject(findPrototypeValue(parent.Properties, item.Label)); then thenBlock else elseBlock">
+                    </div>
+                    <ng-template #thenBlock>{{ findPrototypeValue(parent.Properties, item.Label).Value }}KM</ng-template>
+                    <ng-template #elseBlock>{{ findPrototypeValue(parent.Properties, item.Label) }}</ng-template>
+                  </td>
+                </ng-template>
+                <td *ngIf="enableEditIndex != i">
+                  <button type="button" class="btn btn-secondary mr-1" (click)="switchEditMode(i)">Edit</button>
+                </td>
+              </ng-container>
+
+
+
+              <ng-container *ngIf="enableEditIndex == i" >
+                
+                <td>
+                  <input type="textbox" id="Project_Name" value={{this.parentsData[i].Properties[0].Value}} />
+                </td>
+                <td>
+                  <div *ngIf="this.parentsData[i].Properties[1].PropertyType == 2">
+                    <input type="number" id="Construction_Count" value={{this.parentsData[i].Properties[1].Value}} />
+                  </div>
+                 
+                </td>
+
+                <td>
+                  <div *ngIf="this.parentsData[i].Properties[1].Value == false">
+                    <input type="checkbox" (change)="changed($event)" id="Is_Construction_Completed"
+                      value={{this.parentsData[i].Properties[1].Value}} />
+                  </div>
+                  <div *ngIf=" this.parentsData[i].Properties[1].Value == true">
+                    <input type="checkbox" (change)="changed($event)" id="Is_Construction_Completed"
+                      value={{this.parentsData[i].Properties[1].Value}} checked="true" />
+                  </div>
+                    <div *ngIf="this.parentsData[i].Properties[2].Value == true">
+                      <input type="checkbox" (change)="changed($event)" id="Is_Construction_Completed"
+                        value={{this.parentsData[i].Properties[2].Value}} checked="true" />
+                    </div>
+                    <div *ngIf="this.parentsData[i].Properties[2].Value == false">
+                      <input type="checkbox" (change)="changed($event)" id="Is_Construction_Completed"
+                        value={{this.parentsData[i].Properties[2].Value}} />
+                    </div>
+                   
+                </td>
+                <td>
+                  <div *ngIf="this.parentsData[i].Properties[1].PropertyType == 1">
+                    <input type="number" id="Length_of_the_road"
+                      value={{this.parentsData[i].Properties[1].Value.Value}} />
+                  </div>
+                  <div *ngIf="this.parentsData[i].Properties[2].PropertyType == 1">
+                    <input type="number" id="Length_of_the_road"
+                      value={{this.parentsData[i].Properties[2].Value.Value}} />
+                  </div>
+                  <div *ngIf="this.parentsData[i].Properties[3]?.PropertyType == 1">
+                    <input type="number" id="Length_of_the_road"
+                      value={{this.parentsData[i].Properties[3]?.Value.Value}} />
+                  </div>
+                </td>
+                <td><button type="submit" class="btn btn-primary mr-1" (click)="GridSave(i)">Save</button></td>
+            
+              </ng-container>
+            </tr>
+          </ng-container>
         </tbody>
       </table>
     </mat-tab>
@@ -45,37 +104,40 @@
               <form (ngSubmit)="onSubmit()" [formGroup]="form">
                 <div *ngFor="let question of questions" class="">
                   <div [formGroup]="form">
-                    
-                      <div class="row" style="padding: 10px;">
-                        <div class="col-md-3">
-                          <label [attr.for]="question.key" >{{question.label}}</label>
-                        </div>
-                        <div *ngIf="question.label == 'Length of the road'" class="col-md-9" [ngSwitch]="question.controlType">                          
-                            <input *ngSwitchCase="'textbox'" [formControlName]="question.key" [id]="question.key" style="width:250px"
-                              [type]="question.type" [value]="question.value"  class="form-control text-currency" >  
-                              <span class="currency-code">KM</span>                                      
-                        </div>
-                        <div *ngIf="question.label !== 'Length of the road'" class="col-md-9" [ngSwitch]="question.controlType">                          
-                          <input *ngSwitchCase="'textbox'" [formControlName]="question.key" [id]="question.key" style="width:250px"
-                            [type]="question.type" [value]="question.value"  class="form-control" >
-                          
-                            <label *ngSwitchCase="'checkbox'" [formControlName]="question.key">
-                              <input type="checkbox" [id]="question.key" [type]="question.type" [value]="question.value"
-                                (change)="changeChecked($event)" [checked]="question.value">
-                            </label>                          
+
+                    <div class="row" style="padding: 10px;">
+                      <div class="col-md-3">
+                        <label [attr.for]="question.key">{{question.label}}</label>
                       </div>
+                      <div *ngIf="question.label == 'Length of the road'" class="col-md-9"
+                        [ngSwitch]="question.controlType">
+                        <input *ngSwitchCase="'textbox'" [formControlName]="question.key" [id]="question.key"
+                          style="width:250px" [type]="question.type" [value]="question.value"
+                          class="form-control text-currency">
+                        <span class="currency-code">KM</span>
                       </div>
+                      <div *ngIf="question.label !== 'Length of the road'" class="col-md-9"
+                        [ngSwitch]="question.controlType">
+                        <input *ngSwitchCase="'textbox'" [formControlName]="question.key" [id]="question.key"
+                          style="width:250px" [type]="question.type" [value]="question.value" class="form-control">
+
+                        <label *ngSwitchCase="'checkbox'" [formControlName]="question.key">
+                          <input type="checkbox" [id]="question.key" [type]="question.type" [value]="question.value"
+                            (change)="changeChecked($event)" [checked]="question.value">
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 <div class="form-row">
-                  <button type="submit" class="btn btn-primary mr-1">Save</button>                  
+                  <button type="submit" class="btn btn-primary mr-1">Save</button>
                 </div>
               </form>
-            </div>            
+            </div>
           </div>
         </div>
-      </div>      
+      </div>
     </mat-tab>
   </mat-tab-group>
 </div>

@@ -22,6 +22,27 @@ export class ParentDataMappingService {
       }));
   }
 
+
+  updateParentPropertygrid(data: any): Observable<any> {
+    const headers = {
+      'Content-Type': 'application/json'
+    }
+    
+    if(data.Properties.length>0){
+      data.PropertiesGrid.push(data.Properties[0]);
+    }
+    
+    let body = {
+      samplingTime: data.SamplingTime,
+      properties: JSON.stringify(data.PropertiesGrid).replace(/"/g, "'"),
+      
+      stFilePath: '',
+    };
+    return this.http.post(`${environment.WebApiURL}api/ManageParent/UpdateParentList`, body, { headers }).pipe(map((response: any) => {
+      return response
+    }));
+  }
+
   updateParentProperty(data: any): Observable<any> {
     const headers = {
       'Content-Type': 'application/json'

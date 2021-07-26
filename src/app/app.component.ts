@@ -24,10 +24,20 @@ export class AppComponent {
   properties: Properties
   ActiveSamplingTime: string
   isValidMessage = true;
-  isShowMessageKey = '0'
+  isShowMessageKey = '0';
+  enableEdit = false;
+  enableEditIndex = null;
+  isEditing: boolean = false;
+  Construction_Completed_Changed = null;
   constructor(private _parentDataMappingService: ParentDataMappingService,
     private qcs: QuestionControlService) { }
 
+  switchEditMode(i) {
+    
+    this.isEditing = true;
+    this.enableEditIndex = i;
+  }
+  
   ngOnInit(): void {
     this.getSummaryData();
     this.questions$ = this.getQuestions();
@@ -98,7 +108,7 @@ export class AppComponent {
         //   }
         // });
         //console.log(this.parentsData);
-        var GetFirstParentDataBasedOnSamplingTime = this.parentsData.filter(
+         var GetFirstParentDataBasedOnSamplingTime = this.parentsData.filter(
           parents => parents.SamplingTime === this.parentsData[0].SamplingTime);
         this.ActiveSamplingTime = this.parentsData[0].SamplingTime;
         localStorage.setItem('DBDataSource', JSON.stringify(GetFirstParentDataBasedOnSamplingTime));
@@ -137,7 +147,7 @@ export class AppComponent {
         parents => parents.SamplingTime === this.parentsData[0].SamplingTime);
       localStorage.removeItem('DBDataSource');
       localStorage.setItem('DBDataSource', JSON.stringify(GetFirstParentDataBasedOnSamplingTime));
-
+   
       this.questions$ = this.getQuestions();
       this.updateDynamicFormValues();
     }
@@ -145,8 +155,8 @@ export class AppComponent {
       this.getSummaryData();
     }
   }
-  changeChecked(event) {
-    debugger
+   changeChecked(event) {
+    
     let show = true;
     let show3 = true;
     let i = this.selectedIndex
@@ -277,11 +287,85 @@ export class AppComponent {
   }
 
   //#endregion End Dynamic form
-
+  changed = (evt) => {   
+     
+    this.Construction_Completed_Changed = evt.target.checked;
+    console.log(this.Construction_Completed_Changed)
+    }
+    
   //#region Update Property
-
-  onSubmit() {    
+ 
+  GridSave(i) {
+    
+    this.isEditing = false;
+    this.enableEditIndex = null;
     let body = new Properties()
+
+    let Project_Name = (<HTMLInputElement>document.getElementById("Project_Name")).value
+    let Construction_Count = <HTMLInputElement>document.getElementById("Construction_Count") == null ?"":(<HTMLInputElement>document.getElementById("Construction_Count")).value
+    let Is_Construction_Completed = this.Construction_Completed_Changed ==null ? false:this.Construction_Completed_Changed
+    let Length_of_the_road =<HTMLInputElement>document.getElementById("Length_of_the_road")== null ?"": (<HTMLInputElement>document.getElementById("Length_of_the_road")).value
+    body.PropertiesGrid = []
+    body.Properties = []
+    body.SamplingTime = this.parentsData[i].SamplingTime;
+    
+    
+    body.PropertiesGrid.push({
+      Id: 1,
+      Label: 'Project Name',
+      PropertyType: 0,
+      Value: Project_Name
+
+    });
+   if(Construction_Count != ""){
+    body.PropertiesGrid.push({
+      Id: 2,
+      Label: 'Construction Count',
+      PropertyType: 2,
+      Value: Construction_Count
+    });
+   }
+  
+    body.PropertiesGrid.push({
+      Id: 3,
+      Label: 'Is Construction Completed',
+      PropertyType: 3,
+      Value: JSON.parse(Is_Construction_Completed)
+    });
+    if(Length_of_the_road != ""){
+    body.Properties.push({
+      Id: 4,
+      Label: 'Length of the road',
+      PropertyType: 1,
+      Value: {
+        "Value": Length_of_the_road,
+        "Symbol": 'KM',
+        "Unit": {
+          "Id": 1
+        }
+      }
+    });}
+    this.payLoad = JSON.stringify(body);
+    this._parentDataMappingService.updateParentPropertygrid(body).subscribe((response) => {
+      if (!!response) {
+        alert(response.message);
+        this.getSummaryData();
+      }
+    },
+      (error) => {
+        if (error.status == 0) {
+
+        } else if (error.status == 500) {
+
+        }
+      }
+    );
+  }
+
+ 
+
+  onSubmit() {
+   let body = new Properties()
     let i = this.selectedIndex
     let two = true
     let three = true
@@ -297,7 +381,7 @@ export class AppComponent {
           Label: 'Project Name',
           PropertyType: 0,
           Value: control.value == "" ? 0 : control.value,
-        });        
+        });
       }
       if (key === '2') {
         let show = true;

@@ -19,8 +19,10 @@ import { QuestionControlService } from '../app/services/parent-services/form-com
 import { RenderElementComponent } from './pages/dynamic-form/render-component/render-element/render-element.component';
 // import { SummaryAndDetailedViewComponent } from './pages/DetailsView/summary-and-detailed-view/summary-and-detailed-view.component';
 
+import { FormsModule } from "@angular/forms";
 
 @NgModule({
+ 
   declarations: [
     AppComponent,
     DynamicFormComponent,
@@ -28,7 +30,7 @@ import { RenderElementComponent } from './pages/dynamic-form/render-component/re
     // SummaryAndDetailedViewComponent
   ],
   imports: [
-    BrowserModule,
+    BrowserModule,FormsModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MatTabsModule,
